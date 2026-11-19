@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sistema oficial de sorteo, fixture, control de salas, jueces y tabla de posiciones — I Campeonato de Matemáticas José Ávila Chandía.">
+  <title>I Campeonato de Matemáticas José Ávila Chandía — Gestión Integral</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23071a66' stroke='%23f5c21b' stroke-width='4'/%3E%3Ctext x='32' y='41' font-family='Arial,sans-serif' font-weight='900' font-size='26' fill='%23f5c21b' text-anchor='middle'%3E%CF%80%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700;1,800;1,900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/tombola.css">
+  <link rel="stylesheet" href="./css/fixture.css">
+  <link rel="stylesheet" href="./css/posiciones.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="seal">
+        <img
+          id="heroSeal"
+          src="./assets/logo-ccl.png"
+          alt="Sello LBE Colegio Concepción Linares"
+          onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 120 120%22%3E%3Ccircle cx=%2260%22 cy=%2260%22 r=%2256%22 fill=%22%23071a66%22 stroke=%22%23f5c21b%22 stroke-width=%226%22/%3E%3Ctext x=%2260%22 y=%2254%22 font-family=%22Arial,sans-serif%22 font-weight=%22900%22 font-size=%2222%22 fill=%22%23ffffff%22 text-anchor=%22middle%22%3ELBE CCL%3C/text%3E%3Ctext x=%2260%22 y=%2278%22 font-family=%22Arial,sans-serif%22 font-weight=%22700%22 font-size=%2214%22 fill=%22%23f5c21b%22 text-anchor=%22middle%22%3ECMAT 2026%3C/text%3E%3C/svg%3E';"
+        >
+      </div>
+      <div class="titles">
+        <div class="l1">I CAMPEONATO DE</div>
+        <div class="l2">MATEMÁTICAS</div>
+        <div class="l3">JOSÉ ÁVILA CHANDÍA</div>
+        <div class="tag"><span>Sorteo, Fixture, Jueces y Posiciones · 8° Básico · Formato CMAT</span></div>
+      </div>
+      <div class="codebox">
+        <div class="k">Código oficial</div>
+        <div class="v" id="code">—</div>
+        <div class="t" id="clock"></div>
+      </div>
+    </header>
+
+    <nav class="nav-tabs" role="tablist">
+      <button class="tab-btn active" data-tab="sorteo">1. TÓMBOLA Y SORTEO</button>
+      <button class="tab-btn" data-tab="fixture">2. FIXTURE Y MARCADORES <span class="tab-badge" id="badgeMatches">0/36</span></button>
+      <button class="tab-btn" data-tab="posiciones">3. TABLA DE POSICIONES</button>
+      <button class="tab-btn" data-tab="config">4. JUECES Y CONFIGURACIÓN <span class="tab-badge" id="badgeJudges">0</span></button>
+    </nav>
+
+    <section id="view-sorteo" class="view-panel active">
+      <main class="stage">
+        <div class="group A">
+          <div class="gh"><b>GRUPO A</b><span id="cA">0/6</span></div>
+          <ul id="gA"></ul>
+        </div>
+
+        <div class="drum">
+          <div class="turn" id="turn">Bolita 1 de 12</div>
+          <div id="drawCountdown" class="countdown-pill" style="display:none"></div>
+          <canvas id="tomb" width="600" height="600"></canvas>
+          <div class="out">
+            <div class="big" id="big"></div>
+            <div class="who">
+              <div class="s" id="wS"></div>
+              <div class="e" id="wE"></div>
+              <div class="g" id="wG"></div>
+            </div>
+          </div>
+          <div class="btns">
+            <button class="b-red" id="drawBtn">SACAR BOLITA</button>
+            <button class="b-gold" id="autoBtn">AUTOMÁTICO</button>
+            <button class="b-ghost" id="fsBtn" title="Pantalla completa">⛶</button>
+          </div>
+          <div class="legend" id="legend"></div>
+        </div>
+
+        <div class="group B">
+          <div class="gh"><b>GRUPO B</b><span id="cB">0/6</span></div>
+          <ul id="gB"></ul>
+        </div>
+      </main>
+    </section>
+
+    <section id="view-fixture" class="view-panel">
+      <div class="card-shell">
+        <div class="card-header">
+          <div>
+            <h2>FIXTURE OFICIAL Y CONTROL DE SALAS</h2>
+            <small id="fixSub">Realiza el sorteo o importa un archivo JSON para generar el calendario.</small>
+          </div>
+          <div class="btns" style="margin:0">
+            <button class="b-ghost" id="autoAssignBtn">FIJAR JUECES Y SALAS</button>
+            <button class="b-ghost" id="printResultsBtn">IMPRIMIR RESULTADOS</button>
+            <button class="b-gold" id="actaBtn">ACTA OFICIAL SORTEO</button>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label for="filterJornada">Jornada:</label>
+            <select id="filterJornada">
+              <option value="all">Todas las jornadas (1 y 2)</option>
+              <option value="1">Jornada 1 · Viernes 20 Nov</option>
+              <option value="2">Jornada 2 · Viernes 27 Nov</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filterGrupo">Filtro:</label>
+            <select id="filterGrupo">
+              <option value="all">Todos los cruces (A, B y Finales)</option>
+              <option value="A">Solo Grupo A</option>
+              <option value="B">Solo Grupo B</option>
+              <option value="F">Solo Partido 6 (Final por lugares)</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="printJudgeSelect">Acta por Juez:</label>
+            <select id="printJudgeSelect">
+              <option value="">-- Seleccionar Juez --</option>
+            </select>
+            <button type="button" class="b-gold" id="printJudgeActaBtn" style="padding:6px 12px;font-size:15px">EXPORTAR ACTA JUEZ</button>
+          </div>
+          <div class="collision-status" id="collisionBanner">
+            Sin conflictos de horario ni sala
+          </div>
+        </div>
+
+        <div id="fixBody" class="fix-body"></div>
+      </div>
+    </section>
+
+    <section id="view-posiciones" class="view-panel">
+      <div class="card-shell">
+        <div class="card-header">
+          <div>
+            <h2>TABLA DE POSICIONES POR GRUPO</h2>
+            <small>Victoria: 3 pts · Empate: 1 pt · Derrota: 0 pts | Desempate: 1° Dif. Puntos · 2° Duelo Directo · 3° Menos Penalizaciones</small>
+          </div>
+          <div class="btns" style="margin:0">
+            <button class="b-gold" id="boletinBtn">IMPRIMIR BOLETÍN DE POSICIONES</button>
+          </div>
+        </div>
+
+        <div class="standings-grid" id="standingsContainer"></div>
+      </div>
+    </section>
+
+    <section id="view-config" class="view-panel">
+      <div class="config-grid">
+        <div class="card-shell">
+          <div class="card-header">
+            <div>
+              <h2>REGISTRO DE ÁRBITROS / JUECES</h2>
+              <small>Cada juez queda fijo en su sala para los 6 partidos. Puedes exportar el acta individual de cada juez aquí.</small>
+            </div>
+          </div>
+          <div class="panel-body">
+            <form id="judgeForm" class="form-inline">
+              <input type="text" id="judgeName" placeholder="Nombre completo del juez/profesor" required>
+              <input type="text" id="judgeRole" placeholder="Cargo / Depto. (ej. Prof. Matemática)">
+              <button type="submit" class="b-gold">INSCRIBIR JUEZ</button>
+            </form>
+            <div id="judgesList" class="resource-list"></div>
+          </div>
+        </div>
+
+        <div class="card-shell">
+          <div class="card-header">
+            <div>
+              <h2>SALAS Y ENLACE DE DATOS</h2>
+              <small>Gestiona las 6 salas disponibles y exporta/importa el estado completo del torneo.</small>
+            </div>
+          </div>
+          <div class="panel-body">
+            <label class="field-label">Salas habilitadas (una por línea, mínimo 6):</label>
+            <textarea id="roomsIn" rows="4" spellcheck="false"></textarea>
+            <div class="btns" style="justify-content:flex-start;margin-bottom:18px">
+              <button class="b-gold" id="saveRoomsBtn">GUARDAR SALAS</button>
+            </div>
+
+            <hr class="sep">
+
+            <label class="field-label">Interoperabilidad y Respaldo (JSON):</label>
+            <p class="help-txt">Permite enlazar con otro equipo, respaldar los resultados o cargar un sorteo externo.</p>
+            <div class="btns" style="justify-content:flex-start">
+              <button class="b-ghost dark-btn" id="exportJsonBtn">EXPORTAR TORNEO (.JSON)</button>
+              <label class="b-red file-btn">
+                IMPORTAR SORTEO / TORNEO (.JSON)
+                <input type="file" id="importJsonInput" accept=".json" hidden>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-shell full-col">
+          <div class="card-header">
+            <div>
+              <h2>NÓMINA DE 12 EQUIPOS INSCRITOS</h2>
+              <small>Formato: Código &lt;Tab&gt; Colegio &lt;Tab&gt; Nombre del equipo. Al aplicar se reinicia el sorteo.</small>
+            </div>
+          </div>
+          <div class="panel-body">
+            <textarea id="teamsIn" rows="7" spellcheck="false"></textarea>
+            <div class="btns" style="justify-content:flex-start">
+              <button class="b-gold" id="saveTeamsBtn">APLICAR NÓMINA Y REINICIAR SORTEO</button>
+              <button class="b-red" id="resetAllBtn">REINICIAR TODO EL CAMPEONATO</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
